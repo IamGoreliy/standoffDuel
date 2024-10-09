@@ -26,12 +26,6 @@ export const CreateRoom = ({closeDuelRoom}) => {
                     >
                         Создать лобби
                     </Typography>
-                    <Button
-                        onClick={() => closeDuelRoom(false)}
-                        variant={"outlined"}
-                    >
-                        X
-                    </Button>
                 </Box>
                 <Box
                     component={'form'}
@@ -158,6 +152,7 @@ export const CreateRoom = ({closeDuelRoom}) => {
                             Создать
                         </Button>
                         <Button
+                            onClick={() => closeDuelRoom(false)}
                             variant={'contained'}
                             sx={{
                                 flexBasis: 'calc((100% / 2) - 30px)',

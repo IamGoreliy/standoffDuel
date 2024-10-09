@@ -1,10 +1,17 @@
-import {Box} from "@mui/material";
+import {Box, Container} from "@mui/material";
 
 const Template = ({children}) => {
     return (
-        <Box>
+        <Container
+            component="div"
+            maxWidth="1420"
+            sx={{
+
+                maxWidth: '1420px',
+            }}
+        >
             {children}
-        </Box>
+        </Container>
     )
 }
 

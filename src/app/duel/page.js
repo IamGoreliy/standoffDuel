@@ -5,9 +5,12 @@ import {useCallback, useContext, useEffect, useState} from "react";
 import {FilterDuel} from "@/app/duel/component/FilterDuel";
 import {TableForFilterDuel} from "@/app/duel/component/TableForFilterDuel";
 import {CreateRoom} from "@/app/duel/component/CreateRoom";
+import {DuelOption} from "@/app/duel/component/DuelOption";
 
-function compareNumbers(a, b) {
-    return a - b;
+function closeCreateDuelRoom(e, fnChangeState) {
+    if (e.key === "Escape") {
+        fnChangeState(false);
+    }
 }
 
 const Page = () => {
@@ -18,6 +21,8 @@ const Page = () => {
     const [descendingFilter, setDescendingFilter] = useState(false);
     const [resetFilter, setResetFilter] = useState(false);
     const [createDuelRoom, setCreateDuelRoom] = useState(false);
+
+    const pressEscape = useCallback(e => closeCreateDuelRoom(e, setCreateDuelRoom), []);
 
 
     useEffect(() => {
@@ -41,6 +46,16 @@ const Page = () => {
         }
         setResetFilter(false);
     }, [resetFilter]);
+
+    useEffect(() => {
+        if (createDuelRoom) {
+            window.document.addEventListener("keydown", pressEscape);
+
+            return () => window.document.removeEventListener("keydown", pressEscape);
+        }
+    }, [createDuelRoom]);
+
+
 
     return (
         <Box

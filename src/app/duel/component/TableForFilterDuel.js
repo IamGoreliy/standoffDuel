@@ -1,13 +1,38 @@
 import {Box, Button, Typography} from "@mui/material";
 import {CustomImage} from "@/styledComponent/StyledComponent";
 import {IconUser} from "@/utils/SVGcreate";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {DuelOption} from "@/app/duel/component/DuelOption";
 
 const fnCheckLobby = (roomPlayers, quantityPlayers) => {
     return roomPlayers > quantityPlayers;
 }
 
+
+
 export const TableForFilterDuel = (props) => {
     const {data: duelRoomData} = props;
+    const [duelOption, setDuelOption] = useState(0);
+    const [cursorPositionX, setCursorPositionX] = useState(0);
+    const [cursorPositionY, setCursorPositionY] = useState(0);
+    const floatingCursorPositionRef = useRef({x: 0, y: 0});
+
+
+    const handlerCursorLocation = useCallback((e) =>  {
+        floatingCursorPositionRef.current = {x: e.clientX - 577, y: e.clientY - 180};
+    }, []);
+
+    useEffect(() => {
+        const tableField = document.querySelector('#table');
+        tableField.addEventListener('mousemove', handlerCursorLocation);
+        if (duelOption) {
+            setCursorPositionX(floatingCursorPositionRef.current.x);
+            setCursorPositionY(floatingCursorPositionRef.current.y);
+        }
+
+        return () => tableField.removeEventListener('mousemove', handlerCursorLocation);
+    }, [duelOption]);
+
     return (
         <Box
             sx={{
@@ -19,6 +44,7 @@ export const TableForFilterDuel = (props) => {
                 sx={{
                     borderBottom: '1px solid #191e2b',
                     padding: '5px'
+
                 }}
             >
                 <Typography
@@ -28,6 +54,7 @@ export const TableForFilterDuel = (props) => {
                 </Typography>
             </Box>
             <Box
+                id={'table'}
                 component={'ul'}
                 sx={{
                     listStyle: 'none',
@@ -74,101 +101,112 @@ export const TableForFilterDuel = (props) => {
                                     alignItems: 'center',
                                 }}
                             >
+                                {/*тут изменение добавлен Box*/}
                                 <Box
+                                    onClick={() => setDuelOption(id)}
                                     sx={{
-                                        display: {xs: 'none', md:'flex'},
-                                        justifyContent: 'center',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
                                         alignItems: 'center',
-                                        width: '45px',
-                                        height: '45px',
-                                        backgroundColor: 'white',
-                                        borderRadius: '50%',
                                     }}
                                 >
+                                    <Box
+                                        sx={{
+                                            display: {xs: 'none', md:'flex'},
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            width: '45px',
+                                            height: '45px',
+                                            backgroundColor: 'white',
+                                            borderRadius: '50%',
+                                        }}
+                                    >
 
-                                    {avatarOwnerRoom
-                                        ? <CustomImage
-                                            src={avatarOwnerRoom}
-                                            alt={''}
-                                            width={40}
-                                            height={40}
+                                        {avatarOwnerRoom
+                                            ? <CustomImage
+                                                src={avatarOwnerRoom}
+                                                alt={''}
+                                                width={40}
+                                                height={40}
+                                                sx={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                }}
+                                            />
+                                            : <IconUser
+                                                sx={{
+                                                    width: '40px',
+                                                    height: '40px',
+                                                }}
+                                            />
+                                        }
+                                    </Box>
+                                    <Box
+                                        sx={{
+                                            width: '178px',
+                                        }}
+                                    >
+                                        <Typography
+                                            variant={'subtitle2'}
                                             sx={{
-                                                width: '100%',
-                                                height: '100%',
+                                                color: '#6B7F9D',
+                                                fontSize: '16px',
+                                                lineHeight: '15px'
                                             }}
-                                        />
-                                        : <IconUser
+                                        >
+                                            создатель
+                                        </Typography>
+                                        <Typography
+                                            variant={'h5'}
+                                        >
+                                            {ownerName}
+                                        </Typography>
+                                    </Box>
+                                    <Box
+                                        sx={{
+                                            width: '120px',
+                                            overflow: 'auto'
+                                        }}
+                                    >
+                                        <Typography
+                                            variant={'subtitle2'}
                                             sx={{
-                                                width: '40px',
-                                                height: '40px',
+                                                color: '#6B7F9D',
+                                                fontSize: '16px',
+                                                lineHeight: '15px'
                                             }}
-                                        />
-                                    }
-                                </Box>
-                                <Box
-                                    sx={{
-                                        width: '178px',
-                                    }}
-                                >
-                                    <Typography
-                                        variant={'subtitle2'}
-                                        sx={{
-                                            color: '#6B7F9D',
-                                            fontSize: '16px',
-                                            lineHeight: '15px'
-                                        }}
-                                    >
-                                        создатель
-                                    </Typography>
-                                    <Typography
-                                        variant={'h5'}
-                                    >
-                                        {ownerName}
-                                    </Typography>
-                                </Box>
-                                <Box
-                                    sx={{
-                                        width: '120px',
-                                        overflow: 'auto'
-                                    }}
-                                >
-                                    <Typography
-                                        variant={'subtitle2'}
-                                        sx={{
-                                            color: '#6B7F9D',
-                                            fontSize: '16px',
-                                            lineHeight: '15px'
-                                        }}
-                                    >
-                                        ставка
-                                    </Typography>
-                                    <Typography
-                                        variant={'h5'}
-                                    >
-                                        {betSize} <span style={{color: 'yellow'}}>G</span>
-                                    </Typography>
-                                </Box>
-                                <Box>
-                                    <Typography
-                                        variant={'subtitle2'}
-                                        sx={{
-                                            color: '#6B7F9D',
-                                            fontSize: '16px',
-                                            lineHeight: '15px'
-                                        }}
-                                    >
-                                        игроки
-                                    </Typography>
-                                    <Typography
-                                        variant={'h5'}
-                                        sx={{
-                                            width: '50px',
-                                        }}
+                                        >
+                                            ставка
+                                        </Typography>
+                                        <Typography
+                                            variant={'h5'}
+                                        >
+                                            {betSize} <span style={{color: 'yellow'}}>G</span>
+                                        </Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography
+                                            variant={'subtitle2'}
+                                            sx={{
+                                                color: '#6B7F9D',
+                                                fontSize: '16px',
+                                                lineHeight: '15px'
+                                            }}
+                                        >
+                                            игроки
+                                        </Typography>
+                                        <Typography
+                                            variant={'h5'}
+                                            sx={{
+                                                width: '50px',
+                                            }}
 
-                                    >
-                                        {quantityPlayerInRoom}/{quantityPlayers}
-                                    </Typography>
+                                        >
+                                            {quantityPlayerInRoom}/{quantityPlayers}
+                                        </Typography>
+                                    </Box>
                                 </Box>
+                                {/*конец изменений Box*/}
                                 <Button
                                     variant={'contained'}
                                     // disabled={!fnCheckLobby(quantityPlayers, quantityPlayerInRoom)}
@@ -198,6 +236,7 @@ export const TableForFilterDuel = (props) => {
                     )
                 })}
             </Box>
+            {duelOption > 0 && <DuelOption positionWindow={[cursorPositionX, cursorPositionY]}/>}
         </Box>
     )
 }
