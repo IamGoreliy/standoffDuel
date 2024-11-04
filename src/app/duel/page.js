@@ -1,17 +1,19 @@
 'use client';
 import {Box} from "@mui/material";
 import {DuelRoomData} from "@/app/duel/layout";
-import {useCallback, useContext, useEffect, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useState} from "react";
 import {FilterDuel} from "@/app/duel/component/FilterDuel";
 import {TableForFilterDuel} from "@/app/duel/component/TableForFilterDuel";
 import {CreateRoom} from "@/app/duel/component/CreateRoom";
-import {DuelOption} from "@/app/duel/component/DuelOption";
+import {DuelOption} from "@/app/duel/component/duelOption/DuelOption";
 
 function closeCreateDuelRoom(e, fnChangeState) {
     if (e.key === "Escape") {
         fnChangeState(false);
     }
 }
+
+export const TurnOnBlurContext = createContext(null);
 
 const Page = () => {
     const duelRoomData = useContext(DuelRoomData);
@@ -21,9 +23,11 @@ const Page = () => {
     const [descendingFilter, setDescendingFilter] = useState(false);
     const [resetFilter, setResetFilter] = useState(false);
     const [createDuelRoom, setCreateDuelRoom] = useState(false);
+    const [turnOnBlur, setTurnOnBlur] = useState(false);
+
 
     const pressEscape = useCallback(e => closeCreateDuelRoom(e, setCreateDuelRoom), []);
-
+    const handlerTurnOnBlur = useCallback((result) => setTurnOnBlur(result), []);
 
     useEffect(() => {
         const filterMaxBetAmount = maxBetAmount <= 1 ? 10000 : +maxBetAmount;
@@ -58,47 +62,50 @@ const Page = () => {
 
 
     return (
-        <Box
-            sx={{
-                position: 'relative',
-                display: 'flex',
-                flexDirection: {xs: 'column', lg: 'row'},
-                justifyContent: {xs: 'center', lg: 'unset'},
-                alignItems: {xs: 'center', lg: 'unset'},
-                columnGap: '30px',
-                border: '1px solid #191e2b',
-                mt: '50px',
-            }}
-        >
+        <TurnOnBlurContext.Provider value={handlerTurnOnBlur}>
             <Box
                 sx={{
-                    position: 'absolute',
-                    top: {xs: '10%', lg: '20%'},
+                    position: 'relative',
                     display: 'flex',
-                    justifyContent: 'center',
-                    width: '100%',
-                    transform: createDuelRoom ? 'scale(1)' : 'scale(0)',
-                    transition: 'transform 500ms linear',
-                    zIndex: 5,
+                    flexDirection: {xs: 'column', lg: 'row'},
+                    justifyContent: {xs: 'center', lg: 'unset'},
+                    alignItems: {xs: 'center', lg: 'unset'},
+                    columnGap: '30px',
+                    border: '1px solid #191e2b',
+                    mt: '50px',
+                    filter: {xs: turnOnBlur ? 'blur(10px)' : 'none', md: 'none'},
                 }}
             >
-                <CreateRoom closeDuelRoom={setCreateDuelRoom} />
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: {xs: '10%', lg: '20%'},
+                        display: 'flex',
+                        justifyContent: 'center',
+                        width: '100%',
+                        transform: createDuelRoom ? 'scale(1)' : 'scale(0)',
+                        transition: 'transform 500ms linear',
+                        zIndex: 5,
+                    }}
+                >
+                    <CreateRoom closeDuelRoom={setCreateDuelRoom} />
+                </Box>
+                <FilterDuel
+                    controlFilterInput={
+                        [
+                            minBetAmount,
+                            setMinBetAmount,
+                            maxBetAmount,
+                            setMaxBetAmount
+                        ]
+                    }
+                    fnDesc={setDescendingFilter}
+                    resetFilter={setResetFilter}
+                    createDuelRoom={setCreateDuelRoom}
+                />
+                <TableForFilterDuel data={dataRender} />
             </Box>
-            <FilterDuel
-                controlFilterInput={
-                    [
-                        minBetAmount,
-                        setMinBetAmount,
-                        maxBetAmount,
-                        setMaxBetAmount
-                    ]
-                }
-                fnDesc={setDescendingFilter}
-                resetFilter={setResetFilter}
-                createDuelRoom={setCreateDuelRoom}
-            />
-            <TableForFilterDuel data={dataRender} />
-        </Box>
+        </TurnOnBlurContext.Provider>
     )
 }
 export default Page;

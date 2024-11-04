@@ -4,7 +4,7 @@ import {Footer} from "@/app/component/Footer";
 import {OperationOfBalance} from "@/modalWindow/operationOfBalance/OperationOfBalance";
 import {useEffect, useState} from "react";
 import dynamic from "next/dynamic";
-import {Box} from "@mui/material";
+import {Box, Button} from "@mui/material";
 
 
 
@@ -34,6 +34,44 @@ const Template = ({children}) => {
     return (
         <>
             <Header controlReplenishmentBalance={[walletIsOpen, setWalletIsOpen]}/>
+            <Box
+                sx={{
+                    display: {xs: 'flex', md: 'none'},
+                    justifyContent: 'center',
+                    columnGap: '10px',
+                }}
+            >
+                <Button
+                    variant={'contained'}
+                    sx={{
+                        backgroundColor: 'rgba(37, 35, 35, 1)',
+                        border: '1px solid rgba(81, 81, 81, 1)',
+                        color: '#5E6983',
+                    }}
+                >
+                    главная
+                </Button>
+                <Button
+                    variant={'contained'}
+                    sx={{
+                        backgroundColor: 'rgba(37, 35, 35, 1)',
+                        border: '1px solid rgba(81, 81, 81, 1)',
+                        color: '#5E6983',
+                    }}
+                >
+                    дуэли
+                </Button>
+                <Button
+                    variant={'contained'}
+                    sx={{
+                        backgroundColor: 'rgba(37, 35, 35, 1)',
+                        border: '1px solid rgba(81, 81, 81, 1)',
+                        color: '#5E6983',
+                    }}
+                >
+                    поддержка
+                </Button>
+            </Box>
             {
                 walletIsOpen && (
                     <ModalWindowNoSSR walletIsOpen={walletIsOpen} modalAnimation={modalAnimation}>

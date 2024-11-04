@@ -2,12 +2,14 @@ import {Box, Button, Typography} from "@mui/material";
 import {CustomImage} from "@/styledComponent/StyledComponent";
 import {IconUser} from "@/utils/SVGcreate";
 import {useCallback, useEffect, useRef, useState} from "react";
-import {DuelOption} from "@/app/duel/component/DuelOption";
+import {DuelOption} from "@/app/duel/component/duelOption/DuelOption";
+import {createPortal} from "react-dom";
+import {Modal} from "@/app/duel/component/duelOption/Modal";
+import {MobileDuelOptionMenu} from "@/app/duel/component/duelOption/mobileMenu/MobileDuelOptionMenu";
 
-const fnCheckLobby = (roomPlayers, quantityPlayers) => {
-    return roomPlayers > quantityPlayers;
+const findDataPlayer = (id, playersData) => {
+    return playersData.find(player => player.id === id);
 }
-
 
 
 export const TableForFilterDuel = (props) => {
@@ -19,7 +21,7 @@ export const TableForFilterDuel = (props) => {
 
 
     const handlerCursorLocation = useCallback((e) =>  {
-        floatingCursorPositionRef.current = {x: e.clientX - 577, y: e.clientY - 180};
+        floatingCursorPositionRef.current = {x: e.clientX, y: e.clientY};
     }, []);
 
     useEffect(() => {
@@ -28,6 +30,9 @@ export const TableForFilterDuel = (props) => {
         if (duelOption) {
             setCursorPositionX(floatingCursorPositionRef.current.x);
             setCursorPositionY(floatingCursorPositionRef.current.y);
+        } else {
+            setCursorPositionX(0);
+            setCursorPositionY(0);
         }
 
         return () => tableField.removeEventListener('mousemove', handlerCursorLocation);
@@ -87,10 +92,11 @@ export const TableForFilterDuel = (props) => {
                             key={id}
                             component={'li'}
                             sx={{
-                                border: '1px solid #191e2b',
+                                position: {xs: 'relative', md: 'static'},
                                 borderRadius: '10px',
                                 backgroundColor: '#050914',
                                 padding: '10px',
+                                border: duelOption === id ? '2px solid green' : '1px solid #191e2b',
                             }}
 
                         >
@@ -108,6 +114,7 @@ export const TableForFilterDuel = (props) => {
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         alignItems: 'center',
+                                        cursor: 'pointer',
                                     }}
                                 >
                                     <Box
@@ -209,12 +216,11 @@ export const TableForFilterDuel = (props) => {
                                 {/*конец изменений Box*/}
                                 <Button
                                     variant={'contained'}
-                                    // disabled={!fnCheckLobby(quantityPlayers, quantityPlayerInRoom)}
                                     sx={{
                                         display: {xs: 'none', md: 'unset'},
                                         width: '170px',
                                         height: '50px',
-                                        backgroundColor: fnCheckLobby(quantityPlayers, quantityPlayerInRoom) ? 'green' : 'gray',
+                                        backgroundColor: quantityPlayers > quantityPlayerInRoom ? 'green' : 'gray',
                                     }}
                                 >
                                     Присоединиться
@@ -222,21 +228,42 @@ export const TableForFilterDuel = (props) => {
                             </Box>
                             <Button
                                 variant={'contained'}
-                                // disabled={!fnCheckLobby(quantityPlayers, quantityPlayerInRoom)}
                                 sx={{
                                     display: {xs: 'unset', md: 'none'},
                                     width: '100%',
                                     height: '50px',
-                                    background: fnCheckLobby(quantityPlayers, quantityPlayerInRoom) ? 'linear-gradient(180deg, rgba(0,254,137,1) 0%, rgba(17,101,62,1) 100%)' : 'gray',
+                                    background: quantityPlayers > quantityPlayerInRoom ? 'linear-gradient(180deg, rgba(0,254,137,1) 0%, rgba(17,101,62,1) 100%)' : 'gray',
                                 }}
                             >
                                 Присоединиться
                             </Button>
+                            <Box
+                                sx={{
+                                    mt: '10px',
+                                    display: {xs: duelOption === id ? 'flex' : 'none', lg: 'none'},
+                                    width: '100%',
+                                }}
+                            >
+                                <MobileDuelOptionMenu
+                                    dataPlayer={findDataPlayer(id, duelRoomData)}
+                                    changeStateDuelOption={setDuelOption}
+                                />
+                            </Box>
                         </Box>
                     )
                 })}
             </Box>
-            {duelOption > 0 && <DuelOption positionWindow={[cursorPositionX, cursorPositionY]}/>}
+            {duelOption > 0 && createPortal(
+                <Modal
+                    optionForModal={[
+                        cursorPositionX,
+                        cursorPositionY,
+                        findDataPlayer(duelOption, duelRoomData),
+                        setDuelOption
+                    ]}
+                />,
+                document.body)
+            }
         </Box>
     )
 }
